@@ -68,27 +68,49 @@ public class MagicalArena {
 		Scanner scanner = new Scanner(System.in);
 		Player p1 = players.get(0);
 		Player p2 = players.get(1);
-		int damage = 0;
+		int damage = 1;
+		int defend = 1;
+		int temp;
+		int finalDamage = 0;
+		Player attacker = p1.getHealth() > p2.getHealth() ? p2 : p1;
+		Player defender = p1.getHealth() < p2.getHealth() ? p2 : p1;
 		do {
 			System.out.println("--------------------------");
-			Player attacker = p1.getHealth() > p2.getHealth() ? p2 : p1;
-			Player defender = p1.getHealth() < p2.getHealth() ? p2 : p1;
+			System.out.println("Attacker:-");
 			System.out.println(attacker.getName() + " rolls the die...");
 			System.err.println("Press value greater >= 0 to roll the die");
-			if (scanner.nextInt() >= 0) {
-				damage = attack(rollTheDie());
-				System.out.println(defender.getName() + " got damage of " + damage + ".");
-				if (p1.getName().equals(defender.getName())) {
-					p2.setAttack(attacker.getAttack() - 1);
-					p1.setHealth(defender.getHealth() - damage > 0 ? defender.getHealth() - damage : 0);
-				}
-				if (p2.getName().equals(defender.getName())) {
-					p1.setAttack(attacker.getAttack() - 1);
-					p2.setHealth(defender.getHealth() - damage > 0 ? defender.getHealth() - damage : 0);
-				}
+			temp = scanner.nextInt();
+			int attackerDie = rollTheDie();
+			System.out.println("Number got on die " + attackerDie);
+			System.out.println("Attack damage is "+attackerDie * attacker.getAttack());
+			System.out.println("--------------------------");
+			System.out.println("Defender:-");
+			System.out.println(defender.getName() + " rolls the die...");
+			System.err.println("Press value greater >= 0 to roll the die");
+			temp = scanner.nextInt();
+			int defenderDie = rollTheDie();
+			System.out.println("Number got on die " + defenderDie);
+			System.out.println("Defending strength is "+defenderDie * defender.getStrength());
+			if (temp >= 0) {
+				damage = attackerDie * attacker.getAttack();
+				defend = defenderDie * defender.getStrength();
+				finalDamage = damage - defend > 0 ? damage - defend : 0;
 			}
-			getPlayerDetails(defender);
-			getPlayerDetails(attacker);
+			if (p1.getName().equals(attacker.getName())) {
+				System.out.println(defender.getName() + " got total damage of " + finalDamage);
+				p2.setHealth(defender.getHealth() - finalDamage>0?defender.getHealth() - finalDamage:0);
+				attacker = p2;
+				defender = p1;
+			}
+			else if (p2.getName().equals(attacker.getName())) {
+				System.out.println(defender.getName() + " got total damage of " + finalDamage);
+				p1.setHealth(defender.getHealth() - finalDamage>0?defender.getHealth() - finalDamage:0);
+				attacker = p1;
+				defender = p2;
+			}
+
+			getPlayerDetails(p1);
+			getPlayerDetails(p2);
 			if (attacker.getHealth() == 0) {
 				return defender;
 			}
@@ -106,10 +128,6 @@ public class MagicalArena {
 		System.out.println("Player health: " + player.getHealth());
 		System.out.println("Player strength: " + player.getStrength());
 		System.out.println("Player attack: " + player.getAttack());
-	}
-
-	public static int attack(int die) {
-		return die * 10;
 	}
 
 }
